@@ -11,8 +11,8 @@ class UserController extends Controller
 {
     public function index()
     {
-<<<<<<< HEAD
-        $user = UserModel::where('username', 'manager9')->firstOrFail();
+        $user = UserModel::where('level_id', 2)->count();
+        // dd($user);
         return view('user', ['data' => $user]);
         
         // $user = UserModel::findOrFail(1);
@@ -23,12 +23,6 @@ class UserController extends Controller
         //     abort(404);
         // });
         // return view('user',['data' => $user]);
-=======
-        $user = UserModel::findOr(20, ['username', 'nama'], function(){
-            abort(404);
-        });
-        return view('user',['data' => $user]);
->>>>>>> dc1b34a6b9942efb073e038e9aaeb0dc6bfc1e03
         
         // $user = UserModel::firstWhere('level_id', 1);
         // return view('user', ['data' => $user]);
