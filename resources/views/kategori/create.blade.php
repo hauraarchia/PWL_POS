@@ -39,7 +39,7 @@
                     <label class="col-1 control-label col-form-label">Nama Kategori</label>
                     <div class="col-11">
                         <input type="text" class="form-control" id="kategori_nama" name="kategori_nama" value="{{ old('kategori_nama') }}" required>
-                        @error('kategori_nama')
+                        @error('kategori_kode')
                             <small class="form-text text-danger">{{ $message }}</small>
                         @enderror
                     </div>
@@ -47,12 +47,12 @@
 
                 {{-- <div class="form-group row">
                     <label class="col-1 control-label col-form-label">Password</label>
-<div class="col-11">
-    <input type="password" class="form-control" id="password" name="password" required>
-    @error('password')
-        <small class="form-text text-danger">{{ $message }}</small>
-    @enderror
-</div> --}}
+                    <div class="col-11">
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        @error('password')
+                        <small class="form-text text-danger">{{ $message }}</small>
+                        @enderror
+                    </div> --}}
 
 <div class="form-group row">
     <label class="col-1 control-label col-form-label"></label>
