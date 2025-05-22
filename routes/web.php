@@ -69,6 +69,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/user/{id}/delete_ajax', [UserController::class, 'confirm_ajax']); //menampilkan form confirm delete user ajax
         Route::delete('/user/{id}/delete_ajax', [UserController::class, 'delete_ajax']); // menghapus data user ajax
         Route::delete('/user/{id}', [UserController::class, 'destroy']); // menghapus data user
+
+        //import dengan ajax
+        Route::get('/user/import', [UserController::class, 'import']); //ajax form upload excel
+        Route::post('/user/import_ajax', [UserController::class, 'import_ajax']); //ajax import excel
+
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin)
@@ -95,6 +100,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/level/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']); //menampilkan form confirm delete level ajax
         Route::delete('/level/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); // menghapus data level ajax
         Route::delete('/level/{id}', [LevelController::class, 'destroy']); // menghapus data level
+
+        //import dengan ajax
+        Route::get('/level/import', [LevelController::class, 'import']); //ajax form upload excel
+        Route::post('/level/import_ajax', [LevelController::class, 'import_ajax']); //ajax import excel
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -121,6 +130,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/kategori/{id}/delete_ajax', [KategoriController::class, 'confirm_ajax']); //menampilkan form confirm delete kategori ajax
         Route::delete('/kategori/{id}/delete_ajax', [KategoriController::class, 'delete_ajax']); // menghapus data kategori ajax
         Route::delete('/kategori/{id}', [KategoriController::class, 'destroy']); // menghapus data kategori
+
+        //import dengan ajax
+        Route::get('/kategori/import', [KategoriController::class, 'import']); //ajax form upload excel
+        Route::post('/kategori/import_ajax', [KategoriController::class, 'import_ajax']); //ajax import excel
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -147,6 +160,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/supplier/{id}/delete_ajax', [SupplierController::class, 'confirm_ajax']);
         Route::delete('/supplier/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']);
         Route::delete('/supplier/{id}', [SupplierController::class, 'destroy']);
+
+        //import dengan ajax
+        Route::get('/supplier/import', [SupplierController::class, 'import']); //ajax form upload excel
+        Route::post('/supplier/import_ajax', [SupplierController::class, 'import_ajax']); //ajax import excel
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -156,11 +173,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/barang/list', [BarangController::class, 'list']);
         Route::get('/barang/create', [BarangController::class, 'create']);
         Route::post('/barang', [BarangController::class, 'store']);
-
+ 
         // Create dengan ajax
         Route::get('/barang/create_ajax', [BarangController::class, 'create_ajax']);
         Route::post('/barang/ajax', [BarangController::class, 'store_ajax']);
-
 
         Route::get('/barang/{id}', [BarangController::class, 'show']);
         Route::get('/barang/{id}/edit', [BarangController::class, 'edit']);
@@ -174,5 +190,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/barang/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
         Route::delete('/barang/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
         Route::delete('/barang/{id}', [BarangController::class, 'destroy']);
+        
+        //import dengan ajax
+        Route::get('/barang/import', [BarangController::class,'import']); //ajax form upload excel
+        Route::post('/barang/import_ajax', [BarangController::class,'import_ajax']); //ajax import excel
     });
 });
