@@ -85,34 +85,34 @@
                         }
                     },
                     {
-                    data: "username",
-                    orderable: true,
-                    searchable: true
-                },
-                {
-                    data: "nama",
-                    orderable: true,
-                    searchable: true
-                },
-                {
-                    data: "level.level_nama",
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: "aksi",
-                    orderable: false,
-                    searchable: false
-                }
+                        data: "username",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "nama",
+                        orderable: true,
+                        searchable: true
+                    },
+                    {
+                        data: "level.level_nama",
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: "aksi",
+                        orderable: false,
+                        searchable: false
+                    }
                 ]
             });
             $('#table-user_filter input').unbind().bind().on('keyup', function(e) {
                 if (e.keyCode == 13) { // enter key
-                    tableuser.search(this.value).draw();
+                    tableUser.search(this.value).draw();
                 }
             });
             $('.filter_level').change(function() {
-                tableuser.draw();
+                tableUser.draw();
             });
         });
     </script>

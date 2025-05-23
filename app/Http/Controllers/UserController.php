@@ -196,8 +196,9 @@ class UserController extends Controller
             ->with('level');
 
         // filter data user brdasarkan level_id
-        if ($request->level_id) {
-            $users->where('level_id', $request->level_id);
+        $level_id = $request->input('filter_level');
+        if (!empty($level_id)) {
+            $users->where('level_id', $level_id);
         }
 
         return DataTables::of($users)
