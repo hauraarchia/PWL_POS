@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SupplierModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
@@ -215,6 +216,10 @@ class SupplierController extends Controller
         if ($request->supplier_id) {
             $supplier->where('supplier_id', $request->supplier_id);
         }
+        $supplier_id = $request->input('filter_supplier');
+        if (!empty($supplier_id)) {
+            $supplier->where('supplier_id', $supplier_id);
+        }
 
         return DataTables::of($supplier)
             // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
@@ -298,6 +303,61 @@ class SupplierController extends Controller
                 return response()->json([
                     'status'  => false,
                     'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
+    }
+    public function import()
+    {
+        return view('supplier.import');
+    }
+    public function import_ajax(Request $request)
+    {
+        // dd($request->all());
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                // validasi file harus xls atau xlsx, max 1MB
+                'file_supplier' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+            $file = $request->file('file_supplier'); // ambil file dari request
+            $reader = IOFactory::createReader('Xlsx'); // load reader file excel
+            $reader->setReadDataOnly(true); // hanya membaca data
+            $spreadsheet = $reader->load($file->getRealPath()); // load file excel
+            $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
+            $data = $sheet->toArray(null, false, true, true); // ambil data excel
+            $insert = [];
+            if (count($data) > 1) { // jika data lebih dari 1 baris
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // baris ke 1 adalah header, maka lewati
+                        $insert[] = [
+                            'supplier_kode' => $value['A'],
+                            'supplier_nama' => $value['B'],
+                            'supplier_alamat' => $value['C'],
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+                if (count($insert) > 0) {
+                    // insert data ke database, jika data sudah ada, maka diabaikan
+                    SupplierModel::insertOrIgnore($insert);
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diimport'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
                 ]);
             }
         }
