@@ -83,7 +83,7 @@
                                     title: 'Berhasil', 
                                     text: response.message 
                                 }); 
-                                dataKategori.ajax.reload(); 
+                                tableKategori.ajax.reload(); 
                             }else{ 
                                 $('.error-text').text(''); 
                                 $.each(response.msgField, function(prefix, val) { 

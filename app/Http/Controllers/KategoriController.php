@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\KategoriModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,7 +18,7 @@ class KategoriController extends Controller
             'list' => ['Home', 'Kategori']
         ];
         $page = (object) [
-            'title' => 'Kategori barang yang terdaftar dalam sistem'
+            'title' => 'Kategori kategori yang terdaftar dalam sistem'
         ];
         $activeMenu = 'kategori'; //set menu yang sedang aktif
 
@@ -26,31 +27,31 @@ class KategoriController extends Controller
     }
 
     // Ambil data kategori dalam bentuk json untuk datatables
-//     public function list(Request $request)
-//     {
-//         $kategories = KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama');
+    //     public function list(Request $request)
+    //     {
+    //         $kategories = KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama');
 
-//         // filter data Kategori brdasarkan kategori_id
-//         if ($request->kategori_id) {
-//             $kategories->where('kategori_id', $request->kategori_id);
-//         }
+    //         // filter data Kategori brdasarkan kategori_id
+    //         if ($request->kategori_id) {
+    //             $kategories->where('kategori_id', $request->kategori_id);
+    //         }
 
-//         return DataTables::of($kategories)
-//             // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
-//             ->addIndexColumn()
-//             ->addColumn('aksi', function ($kategories) { // menambahkan kolom aksi
-//                 $btn = '<a href="' . url('/kategori/' . $kategories->kategori_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-//                 $btn .= '<a href="' . url('/kategori/' . $kategories->kategori_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
-//                 $btn .= '<form class="d-inline-block" method="POST" action="' .
-//                     url('/kategori/' . $kategories->kategori_id) . '">'
-//                     . csrf_field() . method_field('DELETE') .
-//                     '<button type="submit" class="btn btn-danger btn-sm" onclick="return
-// confirm(\'Apakah Anda yakit menghapus data ini?\');">Hapus</button></form>';
-//                 return $btn;
-//             })
-//             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
-//             ->make(true);
-//     }
+    //         return DataTables::of($kategories)
+    //             // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
+    //             ->addIndexColumn()
+    //             ->addColumn('aksi', function ($kategories) { // menambahkan kolom aksi
+    //                 $btn = '<a href="' . url('/kategori/' . $kategories->kategori_id) . '" class="btn btn-info btn-sm">Detail</a> ';
+    //                 $btn .= '<a href="' . url('/kategori/' . $kategories->kategori_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
+    //                 $btn .= '<form class="d-inline-block" method="POST" action="' .
+    //                     url('/kategori/' . $kategories->kategori_id) . '">'
+    //                     . csrf_field() . method_field('DELETE') .
+    //                     '<button type="submit" class="btn btn-danger btn-sm" onclick="return
+    // confirm(\'Apakah Anda yakit menghapus data ini?\');">Hapus</button></form>';
+    //                 return $btn;
+    //             })
+    //             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
+    //             ->make(true);
+    //     }
     // Menampilkan halaman form tambah kategori  
     public function create()
     {
@@ -131,7 +132,7 @@ class KategoriController extends Controller
         $request->validate([
             // Kategoriname harus diisi, berupa string, minimal 3 karakter,  
             // dan bernilai unik di tabel m_Kategori kolom Kategoriname kecuali untuk Kategori dengan id yang sedang diedit  
-            'kategori_kode' => 'required|string|min:3|unique:m_kategori,kategori_kode,' .$id . ',kategori_id',
+            'kategori_kode' => 'required|string|min:3|unique:m_kategori,kategori_kode,' . $id . ',kategori_id',
             'kategori_nama' => 'required|string|max:100', // nama kategori harus diisi, berupa string, dan maksimal 100 karakter  
         ]);
 
@@ -206,10 +207,10 @@ class KategoriController extends Controller
         $kategori = KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama');
 
         // filter data Kategori brdasarkan kategori_id
-        if ($request->kategori_id) {
-            $kategori->where('kategori_id', $request->kategori_id);
+        $kategori_id = $request->input('filter_kategori');
+        if (!empty($kategori_id)) {
+            $kategori->where('kategori_id', $kategori_id);
         }
-
         return DataTables::of($kategori)
             // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
             ->addIndexColumn()
@@ -291,6 +292,61 @@ class KategoriController extends Controller
                 return response()->json([
                     'status'  => false,
                     'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
+    }
+
+    public function import()
+    {
+        return view('kategori.import');
+    }
+    public function import_ajax(Request $request)
+    {
+        // dd($request->all());
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                // validasi file harus xls atau xlsx, max 1MB
+                'file_kategori' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+            $file = $request->file('file_kategori'); // ambil file dari request
+            $reader = IOFactory::createReader('Xlsx'); // load reader file excel
+            $reader->setReadDataOnly(true); // hanya membaca data
+            $spreadsheet = $reader->load($file->getRealPath()); // load file excel
+            $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
+            $data = $sheet->toArray(null, false, true, true); // ambil data excel
+            $insert = [];
+            if (count($data) > 1) { // jika data lebih dari 1 baris
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // baris ke 1 adalah header, maka lewati
+                        $insert[] = [
+                            'kategori_kode' => $value['A'],
+                            'kategori_nama' => $value['B'],
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+                if (count($insert) > 0) {
+                    // insert data ke database, jika data sudah ada, maka diabaikan
+                    KategoriModel::insertOrIgnore($insert);
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diimport'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
                 ]);
             }
         }
