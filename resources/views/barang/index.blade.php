@@ -7,8 +7,7 @@
 
                 <button onclick="modalAction('{{ url('/barang/import') }}')" class="btn btn-info">Import Barang</button>
                 <a href="{{ url('/barang/create') }}" class="btn btn-primary">Tambah Data</a>
-                <button onclick="modalAction('{{ url('/barang/create_ajax') }}')" class="btn btn-success">Tambah Data
-                    (Ajax)</button>
+                <button onclick="modalAction('{{ url('/barang/create_ajax') }}')" class="btn btn-success">Tambah Data (Ajax)</button>
             </div>
         </div>
         <div class="card-body">
@@ -42,20 +41,19 @@
                     <tr>
                         <th>No</th>
                         <th>Kode Barang</th>
-                        <th>Kode Barang</th>
+                        <th>Nama Barang</th>
                         <th>Harga Beli</th>
                         <th>Harga Jual</th>
                         <th>Kategori</th>
                         <th>Aksi</th>
                     </tr>
-
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
     <div id="myModal" class="modal fade animate shake" tabindex="-1" data-backdrop="static" data-keyboard="false"
-        data-width="75%"></div>
+        data-width="75%" aria-hidden="true"></div>
 @endsection
 @push('js')
     <script>
