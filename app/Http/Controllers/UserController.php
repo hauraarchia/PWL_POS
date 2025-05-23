@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\UserModel;
 use App\Models\LevelModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
-use Monolog\Level;
-use Psy\CodeCleaner\FunctionReturnInWriteContextPass;
-use Symfony\Contracts\Service\Attribute\Required;
 
 class UserController extends Controller
 {
@@ -28,34 +27,6 @@ class UserController extends Controller
         $level = LevelModel::all(); //ambil data level untuk filter level
         return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
     }
-
-    //     // Ambil data user dalam bentuk json untuk datatables
-    //     public function list(Request $request)
-    //     {
-    //         $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
-    //             ->with('level');
-
-    //         // filter data user brdasarkan level_id
-    //         if ($request->level_id) {
-    //             $users->where('level_id', $request->level_id);
-    //         }
-
-    //         return DataTables::of($users)
-    //             // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
-    //             ->addIndexColumn()
-    //             ->addColumn('aksi', function ($user) { // menambahkan kolom aksi
-    //                 $btn = '<a href="' . url('/user/' . $user->user_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-    //                 $btn .= '<a href="' . url('/user/' . $user->user_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
-    //                 $btn .= '<form class="d-inline-block" method="POST" action="' .
-    //                     url('/user/' . $user->user_id) . '">'
-    //                     . csrf_field() . method_field('DELETE') .
-    //                     '<button type="submit" class="btn btn-danger btn-sm" onclick="return
-    // confirm(\'Apakah Anda yakit menghapus data ini?\');">Hapus</button></form>';
-    //                 return $btn;
-    //             })
-    //             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
-    //             ->make(true);
-    //     }
 
     // Menampilkan halaman form tambah user  
     public function create()
@@ -308,27 +279,6 @@ class UserController extends Controller
         return view('user.confirm_ajax', ['user' => $user]);
     }
 
-    // public function delete_ajax(Request $request, $id)
-    // {
-    //     // cek apakah request dari ajax
-    //     if ($request->ajax() || $request->wantsJson()) {
-    //         $user = UserModel::find($id);
-    //         if ($user) {
-    //             $user->delete();
-    //             return response()->json([
-    //                 'status'  => true,
-    //                 'message' => 'Data berhasil dihapus'
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'status'  => false,
-    //                 'message' => 'Data tidak ditemukan'
-    //             ]);
-    //         }
-    //     }
-    //     return redirect('/');
-    // }
-
     public function delete_ajax(Request $request, $id)
     {
         // cek apakah request dari ajax
@@ -344,6 +294,63 @@ class UserController extends Controller
                 return response()->json([
                     'status'  => false,
                     'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
+    }
+    public function import()
+    {
+        return view('user.import');
+    }
+    public function import_ajax(Request $request)
+    {
+        // dd($request->all());
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                // validasi file harus xls atau xlsx, max 1MB
+                'file_user' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+            $file = $request->file('file_user'); // ambil file dari request
+            $reader = IOFactory::createReader('Xlsx'); // load reader file excel
+            $reader->setReadDataOnly(true); // hanya membaca data
+            $spreadsheet = $reader->load($file->getRealPath()); // load file excel
+            $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
+            $data = $sheet->toArray(null, false, true, true); // ambil data excel
+            $insert = [];
+            if (count($data) > 1) { // jika data lebih dari 1 baris
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // baris ke 1 adalah header, maka lewati
+                        $insert[] = [
+                            'level_id' => $value['A'],
+                            'username' => $value['B'],
+                            'nama' => $value['C'],
+                            'password' => Hash::make($value['D']), // Hash password here
+                            'created_at' => now(),
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+                if (count($insert) > 0) {
+                    // insert data ke database, jika data sudah ada, maka diabaikan
+                    UserModel::insertOrIgnore($insert);
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diimport'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
                 ]);
             }
         }
