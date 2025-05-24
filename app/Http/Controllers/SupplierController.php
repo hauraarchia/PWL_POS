@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KategoriModel;
 use Illuminate\Http\Request;
 use App\Models\SupplierModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -26,32 +27,32 @@ class SupplierController extends Controller
         return view('supplier.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'supplier' => $supplier, 'activeMenu' => $activeMenu]);
     }
 
-//     // Ambil data supplier dalam bentuk json untuk datatables
-//     public function list(Request $request)
-//     {
-//         $supplier = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat');
+    //     // Ambil data supplier dalam bentuk json untuk datatables
+    //     public function list(Request $request)
+    //     {
+    //         $supplier = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat');
 
-//         // filter data user brdasarkan supplier_id
-//         if ($request->supplier_id) {
-//             $supplier->where('supplier_id', $request->supplier_id);
-//         }
+    //         // filter data user brdasarkan supplier_id
+    //         if ($request->supplier_id) {
+    //             $supplier->where('supplier_id', $request->supplier_id);
+    //         }
 
-//         return DataTables::of($supplier)
-//             // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
-//             ->addIndexColumn()
-//             ->addColumn('aksi', function ($supplier) { // menambahkan kolom aksi
-//                 $btn = '<a href="' . url('/supplier/' . $supplier->supplier_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-//                 $btn .= '<a href="' . url('/supplier/' . $supplier->supplier_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
-//                 $btn .= '<form class="d-inline-block" method="POST" action="' .
-//                     url('/supplier/' . $supplier->supplier_id) . '">'
-//                     . csrf_field() . method_field('DELETE') .
-//                     '<button type="submit" class="btn btn-danger btn-sm" onclick="return
-// confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
-//                 return $btn;
-//             })
-//             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
-//             ->make(true);
-//     }
+    //         return DataTables::of($supplier)
+    //             // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
+    //             ->addIndexColumn()
+    //             ->addColumn('aksi', function ($supplier) { // menambahkan kolom aksi
+    //                 $btn = '<a href="' . url('/supplier/' . $supplier->supplier_id) . '" class="btn btn-info btn-sm">Detail</a> ';
+    //                 $btn .= '<a href="' . url('/supplier/' . $supplier->supplier_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
+    //                 $btn .= '<form class="d-inline-block" method="POST" action="' .
+    //                     url('/supplier/' . $supplier->supplier_id) . '">'
+    //                     . csrf_field() . method_field('DELETE') .
+    //                     '<button type="submit" class="btn btn-danger btn-sm" onclick="return
+    // confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
+    //                 return $btn;
+    //             })
+    //             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
+    //             ->make(true);
+    //     }
     // Menampilkan halaman form tambah supplier  
     public function create()
     {
@@ -134,7 +135,7 @@ class SupplierController extends Controller
         $request->validate([
             // username harus diisi, berupa string, minimal 3 karakter,  
             // dan bernilai unik di tabel m_user kolom username kecuali untuk user dengan id yang sedang diedit  
-            'supplier_kode' => 'required|string|min:3|unique:m_supplier,supplier_kode,' .$id . ',supplier_id',
+            'supplier_kode' => 'required|string|min:3|unique:m_supplier,supplier_kode,' . $id . ',supplier_id',
             'supplier_nama' => 'required|string|max:100', // nama supplier harus diisi, berupa string, dan maksimal 100 karakter  
             'supplier_alamat' => 'required|string|max:100', // alamat supplier harus diisi, berupa string, dan maksimal 100 karakter  
         ]);
@@ -362,5 +363,57 @@ class SupplierController extends Controller
             }
         }
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        //ambil data supp$supplier yang akan di export
+
+        $supplier = SupplierModel::select('supplier_kode', 'supplier_nama', 'supplier_alamat')
+            ->get();
+
+        //load library excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); //ambil sheet yang aktif
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Supplier');
+        $sheet->setCellValue('C1', 'Nama Supplier');
+        $sheet->setCellValue('D1', 'Alamat Supplier');
+
+        $sheet->getStyle('A1:D1')->getFont()->setBold(true); //bold header
+
+        $no = 1; //nomor dimulai dari 1
+        $baris = 2;
+        foreach ($supplier as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->supplier_kode);
+            $sheet->setCellValue('C' . $baris, $value->supplier_nama);
+            $sheet->setCellValue('D' . $baris, $value->supplier_alamat);
+            $baris++;
+            $no++;
+        }
+
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true); //set autosize untuk kolom
+        }
+
+        $sheet->setTitle('Data Supplier'); // set title sheet
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Supplier ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+        //end function export_excel
     }
 }
