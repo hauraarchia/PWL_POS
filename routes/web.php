@@ -74,6 +74,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/user/import', [UserController::class, 'import']); //ajax form upload excel
         Route::post('/user/import_ajax', [UserController::class, 'import_ajax']); //ajax import excel
 
+        // export excel dengan ajax
+        Route::get('/user/export_excel', [UserController::class, 'export_excel']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin)
@@ -104,6 +106,9 @@ Route::middleware(['auth'])->group(function () {
         //import dengan ajax
         Route::get('/level/import', [LevelController::class, 'import']); //ajax form upload excel
         Route::post('/level/import_ajax', [LevelController::class, 'import_ajax']); //ajax import excel
+
+        // export excel dengan ajax
+        Route::get('/level/export_excel', [LevelController::class, 'export_excel']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -134,6 +139,9 @@ Route::middleware(['auth'])->group(function () {
         //import dengan ajax
         Route::get('/kategori/import', [KategoriController::class, 'import']); //ajax form upload excel
         Route::post('/kategori/import_ajax', [KategoriController::class, 'import_ajax']); //ajax import excel
+
+        // export excel dengan ajax
+        Route::get('/kategori/export_excel', [KategoriController::class, 'export_excel']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -164,6 +172,9 @@ Route::middleware(['auth'])->group(function () {
         //import dengan ajax
         Route::get('/supplier/import', [SupplierController::class, 'import']); //ajax form upload excel
         Route::post('/supplier/import_ajax', [SupplierController::class, 'import_ajax']); //ajax import excel
+
+        // export excel dengan ajax
+        Route::get('/supplier/export_excel', [SupplierController::class, 'export_excel']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -173,7 +184,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/barang/list', [BarangController::class, 'list']);
         Route::get('/barang/create', [BarangController::class, 'create']);
         Route::post('/barang', [BarangController::class, 'store']);
- 
+
         // Create dengan ajax
         Route::get('/barang/create_ajax', [BarangController::class, 'create_ajax']);
         Route::post('/barang/ajax', [BarangController::class, 'store_ajax']);
@@ -190,9 +201,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/barang/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
         Route::delete('/barang/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
         Route::delete('/barang/{id}', [BarangController::class, 'destroy']);
-        
+
         //import dengan ajax
-        Route::get('/barang/import', [BarangController::class,'import']); //ajax form upload excel
-        Route::post('/barang/import_ajax', [BarangController::class,'import_ajax']); //ajax import excel
+        Route::get('/barang/import', [BarangController::class, 'import']); //ajax form upload excel
+        Route::post('/barang/import_ajax', [BarangController::class, 'import_ajax']); //ajax import excel
+
+        // export excel dengan ajax
+        Route::get('/barang/export_excel', [BarangController::class, 'export_excel']);
     });
 });
