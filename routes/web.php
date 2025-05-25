@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\LevelController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\BarangController;
-use App\Http\Controllers\WelcomeController;
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LevelController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\SupplierController;
 
 /*
 |--------------------------------------------------------------------------
@@ -220,8 +221,16 @@ Route::middleware(['auth'])->group(function () {
 
         // export excel dengan ajax
         Route::get('/barang/export_excel', [BarangController::class, 'export_excel']);
-        
+
         // export pdf dengan ajax
         Route::get('/barang/export_pdf', [BarangController::class, 'export_pdf']);
+    });
+
+    Route::middleware(['auth', 'authorize:ADM,MGR,STF'])->group(function () {
+        Route::group(['prefix' => 'profile'], function () {
+            Route::get('/', [ProfileController::class, 'index']);
+            Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+            Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
+        });
     });
 });
