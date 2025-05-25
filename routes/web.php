@@ -76,6 +76,9 @@ Route::middleware(['auth'])->group(function () {
 
         // export excel dengan ajax
         Route::get('/user/export_excel', [UserController::class, 'export_excel']);
+
+        // export pdf dengan ajax
+        Route::get('/user/export_pdf', [UserController::class, 'export_pdf']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin)
@@ -109,6 +112,9 @@ Route::middleware(['auth'])->group(function () {
 
         // export excel dengan ajax
         Route::get('/level/export_excel', [LevelController::class, 'export_excel']);
+
+        // export pdf dengan ajax
+        Route::get('/level/export_pdf', [LevelController::class, 'export_pdf']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -142,6 +148,9 @@ Route::middleware(['auth'])->group(function () {
 
         // export excel dengan ajax
         Route::get('/kategori/export_excel', [KategoriController::class, 'export_excel']);
+
+        // export pdf dengan ajax
+        Route::get('/kategori/export_pdf', [KategoriController::class, 'export_pdf']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -175,6 +184,9 @@ Route::middleware(['auth'])->group(function () {
 
         // export excel dengan ajax
         Route::get('/supplier/export_excel', [SupplierController::class, 'export_excel']);
+
+        // export pdf dengan ajax
+        Route::get('/supplier/export_pdf', [SupplierController::class, 'export_pdf']);
     });
 
     //artinya semua route di dalam group ini harus punya role ADM (admin) atau (MNG) manager
@@ -208,5 +220,8 @@ Route::middleware(['auth'])->group(function () {
 
         // export excel dengan ajax
         Route::get('/barang/export_excel', [BarangController::class, 'export_excel']);
+        
+        // export pdf dengan ajax
+        Route::get('/barang/export_pdf', [BarangController::class, 'export_pdf']);
     });
 });
