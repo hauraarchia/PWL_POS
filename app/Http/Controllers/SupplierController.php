@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\KategoriModel;
 use Illuminate\Http\Request;
+use App\Models\KategoriModel;
 use App\Models\SupplierModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -23,7 +24,7 @@ class SupplierController extends Controller
         ];
         $activeMenu = 'supplier'; //set menu yang sedang aktif
 
-        $supplier = SupplierModel::all(); //ambil data level untuk filter level
+        $supplier = SupplierModel::all(); //ambil data supplier untuk filter supplier
         return view('supplier.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'supplier' => $supplier, 'activeMenu' => $activeMenu]);
     }
 
@@ -65,7 +66,7 @@ class SupplierController extends Controller
             'title' => 'Tambah supplier baru',
         ];
 
-        $supplier = SupplierModel::all(); // ambil data level untuk ditampilkan di form  
+        $supplier = SupplierModel::all(); // ambil data supplier untuk ditampilkan di form  
         $activeMenu = 'supplier'; // set menu yang sedang aktif  
 
         return view('supplier.create', ['breadcrumb' => $breadcrumb, 'page' => $page, 'supplier' => $supplier, 'activeMenu' => $activeMenu]);
@@ -157,7 +158,7 @@ class SupplierController extends Controller
         }
 
         try {
-            SupplierModel::destroy($id); //hapus data level
+            SupplierModel::destroy($id); //hapus data supplier
             return redirect('/supplier')->with('success', 'Data supplier berhasil dihapus');
         } catch (\Illuminate\Database\QueryException $e) {
             //jika terjadi error ketika menghapus data, redirect kembali ke halaman dengan membawa pesan error
@@ -415,5 +416,20 @@ class SupplierController extends Controller
         $writer->save('php://output');
         exit;
         //end function export_excel
+    }
+
+    public function export_pdf()
+    {
+        $supplier = SupplierModel::select('supplier_kode', 'supplier_nama', 'supplier_alamat')
+            ->orderBy('supplier_kode')
+            ->get();
+
+        // use Barryvdh\DomPDF\Facade\Pdf;
+        $pdf = Pdf::loadView('supplier.export_pdf', ['supplier' => $supplier]);
+        $pdf->setPaper('a4', 'portrait'); // set ukuran kertas dan orientasi
+        $pdf->setOption('isRemoteEnabled', true); // set true jika ada gambar dari url
+        $pdf->render();
+
+        return $pdf->stream('Data Supplier ' . date('Y-m-d H:i:s') . '.pdf');
     }
 }
