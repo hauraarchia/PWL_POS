@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d71cfdab90e3767d49fa806258b3be3",
+    "content-hash": "9b5eb7df64143605c25301708ed1b565",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -6606,32 +6606,32 @@
         },
         {
             "name": "tymon/jwt-auth",
-            "version": "2.2.1",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tymondesigns/jwt-auth.git",
-                "reference": "42381e56db1bf887c12e5302d11901d65cc74856"
+                "reference": "51620ebd5b68bb3ce9e66ba86bda303ae5f10f7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tymondesigns/jwt-auth/zipball/42381e56db1bf887c12e5302d11901d65cc74856",
-                "reference": "42381e56db1bf887c12e5302d11901d65cc74856",
+                "url": "https://api.github.com/repos/tymondesigns/jwt-auth/zipball/51620ebd5b68bb3ce9e66ba86bda303ae5f10f7f",
+                "reference": "51620ebd5b68bb3ce9e66ba86bda303ae5f10f7f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/auth": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/http": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+                "illuminate/auth": "^9.0|^10.0|^11.0",
+                "illuminate/contracts": "^9.0|^10.0|^11.0",
+                "illuminate/http": "^9.0|^10.0|^11.0",
+                "illuminate/support": "^9.0|^10.0|^11.0",
                 "lcobucci/jwt": "^4.0",
-                "nesbot/carbon": "^2.69|^3.0",
+                "nesbot/carbon": "^2.0|^3.0",
                 "php": "^8.0"
             },
             "require-dev": {
-                "illuminate/console": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/database": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/routing": "^9.0|^10.0|^11.0|^12.0",
-                "mockery/mockery": "^1.6",
+                "illuminate/console": "^9.0|^10.0|^11.0",
+                "illuminate/database": "^9.0|^10.0|^11.0",
+                "illuminate/routing": "^9.0|^10.0|^11.0",
+                "mockery/mockery": ">=0.9.9",
                 "phpunit/phpunit": "^9.4"
             },
             "type": "library",
@@ -6686,7 +6686,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2025-04-16T22:22:54+00:00"
+            "time": "2024-03-14T19:29:49+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
