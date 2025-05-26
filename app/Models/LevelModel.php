@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class LevelModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'm_level'; //mendefinisikan nama table yang digunakan oleh model ini
-    protected $primaryKey = 'level_id'; //mendefinisikan primary key dari table yang digunakan
+    protected $table = 'm_level';
+    protected $primaryKey = 'level_id';
+    protected $fillable = ['level_kode', 'level_nama'];
 
-    public function users(): HasMany
-    {
-        return $this->hasMany(UserModel::class);
+    public function level(): BelongsTo {
+        return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
     }
 }
