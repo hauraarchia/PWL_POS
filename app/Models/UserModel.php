@@ -27,7 +27,7 @@ class UserModel extends Authenticatable implements JWTSubject
 
     protected $table = 'm_user';
     protected $primaryKey = 'user_id';
-    protected $fillable = ['level_id', 'username', 'avatar', 'nama', 'password', 'created_at', 'updated_at'];
+    protected $fillable = ['level_id', 'username', 'avatar', 'nama', 'password', 'image'];
 
     protected $hidden = ['password'];
     protected $casts = ['password' => 'hashed'];
@@ -36,28 +36,37 @@ class UserModel extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
     }
-    public function getRoleName(): string
+
+    protected function image(): Attribute
     {
-        return $this->level->level_nama;
+        return Attribute::make(
+            get: fn ($image) => url('/storage/posts/' . $image),
+        );
     }
 
-    public function hasRole($role): bool
-    {
-        return $this->level->level_kode == $role;
-    }
+    
+    // public function getRoleName(): string
+    // {
+    //     return $this->level->level_nama;
+    // }
 
-    public function getRole()
-    {
-        return $this->level->level_kode;
-    }
+    // public function hasRole($role): bool
+    // {
+    //     return $this->level->level_kode == $role;
+    // }
 
-    public function getAvatarUrl(): string
-    {
-        if ($this->avatar && file_exists(public_path($this->avatar))) {
-            return asset($this->avatar);
-        } else {
-            $avatar = new Avatar();
-            return $avatar->create($this->nama)->toBase64();
-        }
-    }
+    // public function getRole()
+    // {
+    //     return $this->level->level_kode;
+    // }
+
+    // public function getAvatarUrl(): string
+    // {
+    //     if ($this->avatar && file_exists(public_path($this->avatar))) {
+    //         return asset($this->avatar);
+    //     } else {
+    //         $avatar = new Avatar();
+    //         return $avatar->create($this->nama)->toBase64();
+    //     }
+    // }
 }
